@@ -1125,6 +1125,106 @@ body {
   font-weight: 800;
 }
 
+/* Email updates opt-in */
+.email-updates-panel {
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  text-align: left;
+}
+
+.email-updates-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 0.35rem;
+  color: var(--text-primary);
+}
+
+.email-updates-copy {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.email-updates-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.email-updates-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.email-updates-input {
+  flex: 1 1 180px;
+  min-height: 44px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.email-updates-input:focus {
+  outline: none;
+  border-color: var(--tile-green);
+}
+
+.email-updates-btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--tile-green);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.email-updates-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.email-updates-status {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  min-height: 1.1em;
+}
+
+.email-updates-status.is-ok {
+  color: var(--tile-green);
+}
+
+.email-updates-status.is-error {
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .email-updates-status.is-error {
+  color: #fca5a5;
+}
+
 .text-link-nav {
   font-size: 0.78rem;
   font-weight: 700;

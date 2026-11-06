@@ -163,6 +163,59 @@
   const shareRedditLink = document.getElementById("share-reddit-link");
 
   let lastSharePayload = null;
+  let lastSubmittedWordForEmail = "";
+
+  const emailUpdatesPanel = document.getElementById("email-updates-panel");
+  const emailUpdatesForm = document.getElementById("email-updates-form");
+  const emailUpdatesInput = document.getElementById("email-updates-input");
+  const emailUpdatesBtn = document.getElementById("email-updates-btn");
+  const emailUpdatesStatus = document.getElementById("email-updates-status");
+
+  function setEmailUpdatesStatus(message, state) {
+    if (!emailUpdatesStatus) return;
+    emailUpdatesStatus.textContent = message || "";
+    emailUpdatesStatus.className = "email-updates-status";
+    if (state === "ok") emailUpdatesStatus.classList.add("is-ok");
+    if (state === "error") emailUpdatesStatus.classList.add("is-error");
+  }
+
+  function showEmailUpdatesPanel(word) {
+    if (!emailUpdatesPanel) return;
+    lastSubmittedWordForEmail = String(word || "").toLowerCase().replace(/\s+/g, " ");
+    setEmailUpdatesStatus("", "");
+    if (emailUpdatesInput) emailUpdatesInput.value = "";
+    emailUpdatesPanel.classList.remove("hidden");
+  }
+
+  if (emailUpdatesForm) {
+    emailUpdatesForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const rawEmail = emailUpdatesInput ? emailUpdatesInput.value.trim() : "";
+      if (!rawEmail) {
+        setEmailUpdatesStatus("Enter your email address.", "error");
+        emailUpdatesInput?.focus();
+        return;
+      }
+      if (!lastSubmittedWordForEmail) {
+        setEmailUpdatesStatus("Submit a word first, then opt in to updates.", "error");
+        return;
+      }
+      if (emailUpdatesBtn) emailUpdatesBtn.disabled = true;
+      setEmailUpdatesStatus("Sending confirmation link…", "");
+      try {
+        await apiRequest("/api/email/subscribe", {
+          method: "POST",
+          body: JSON.stringify({ email: rawEmail, word: lastSubmittedWordForEmail }),
+        });
+        setEmailUpdatesStatus("Check your inbox to confirm (double opt-in).", "ok");
+        showToast("Confirmation email sent — check your inbox.", "success", 3200);
+      } catch (err) {
+        setEmailUpdatesStatus(err.message || "Could not start email updates.", "error");
+      } finally {
+        if (emailUpdatesBtn) emailUpdatesBtn.disabled = false;
+      }
+    });
+  }
 
   const leaderboardList = document.getElementById("leaderboard-list");
   const refreshBtn = document.getElementById("refresh-btn");
@@ -513,6 +566,7 @@
     }
     resultCard.classList.remove("hidden");
     showSharePanel(submission, streak);
+    showEmailUpdatesPanel(submission.word || recentSubmittedWord);
   }
 
   // Render Stats Bar
