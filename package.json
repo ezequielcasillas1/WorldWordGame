@@ -1,0 +1,10 @@
+{
+  "name": "worldwordgame",
+  "private": true,
+  "version": "1.0.0",
+  "description": "World Word — global word frequency game",
+  "scripts": {
+    "test": "node scripts/test-moderation.mjs",
+    "start": "npx --yes serve -l 4173 ."
+  }
+}
