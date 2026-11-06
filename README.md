@@ -14,6 +14,8 @@ npm ci && npm test && npm run deploy
 
 Static assets only — keep your existing Worker/API routes for `/api/*` unchanged in the Cloudflare dashboard.
 
+**Custom domain:** apex DNS should point at Pages (`CNAME` `@` → `worldwordgame.pages.dev`, proxied). If `/sitemap.xml` or `/og-image.png` 404 on `.com` but work on `worldwordgame.pages.dev`, the apex is not fully on Pages yet—finish **Custom domains** in the Pages project and remove catch-all Worker routes.
+
 ## Local preview
 
 ```bash
