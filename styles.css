@@ -288,6 +288,85 @@ body {
   margin-bottom: 0.9rem;
 }
 
+.mode-toggle {
+  display: inline-flex;
+  gap: 0.35rem;
+  margin: 0 auto 0.85rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+}
+
+.mode-btn {
+  min-width: 5.5rem;
+  padding: 0.45rem 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mode-btn:hover {
+  color: var(--text-primary);
+}
+
+.mode-btn.is-active {
+  background: var(--tile-green);
+  color: #ffffff;
+}
+
+.mode-btn:focus-visible {
+  outline: 2px solid var(--tile-yellow);
+  outline-offset: 2px;
+}
+
+.sense-status {
+  width: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.sense-status.is-checking {
+  color: var(--tile-yellow);
+}
+
+.sense-status.is-ok {
+  color: var(--tile-green);
+}
+
+.sense-status.is-error {
+  color: #c33;
+}
+
+[data-theme="dark"] .sense-status.is-error {
+  color: #f07178;
+}
+
+.word-input.is-phrase-mode {
+  letter-spacing: 0.06em;
+  font-size: 1.1rem;
+}
+
+.letter-tile.is-space {
+  width: 0.55rem;
+  min-width: 0.55rem;
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+}
+
 .word-form {
   display: flex;
   flex-direction: column;

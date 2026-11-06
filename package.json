@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/verify.mjs",
+    "test": "node scripts/verify.mjs && node scripts/test-phrase-sense.mjs",
     "start": "npx --yes serve . -l 4173",
     "generate:assets": "node scripts/generate-assets.mjs",
     "deploy": "wrangler pages deploy . --project-name=worldwordgame --branch=main"

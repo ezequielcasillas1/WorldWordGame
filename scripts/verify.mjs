@@ -15,6 +15,7 @@ const required = [
   "site.webmanifest",
   "og-image.png",
   "favicon.svg",
+  "phraseSense.js",
 ];
 
 let failed = false;

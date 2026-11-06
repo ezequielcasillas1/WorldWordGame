@@ -6,8 +6,11 @@
   const RECENT_WORD_STORAGE_KEY = "worldword_recent_word";
   const STREAK_STORAGE_KEY = "worldword_streak";
   const LAST_PLAY_DATE_KEY = "worldword_last_play_date";
+  const SUBMIT_MODE_STORAGE_KEY = "worldword_submit_mode";
   const AUTO_REFRESH_SECONDS = 30;
   const TILE_COLOR_CLASSES = ["tile-green", "tile-yellow", "tile-gray"];
+  const WORD_MAX_CHARS = 50;
+  const PHRASE_MAX_CHARS = 80;
 
   // Persistent Visitor ID for multi-visitor tracking via X-Visitor-Id header
   function getOrCreateVisitorId() {
@@ -57,6 +60,92 @@
   const wordInput = document.getElementById("word-input");
   const charCounter = document.getElementById("char-counter");
   const submitBtn = document.getElementById("submit-btn");
+  const inputHint = document.getElementById("input-hint");
+  const promptHeading = document.getElementById("prompt-heading");
+  const senseStatus = document.getElementById("sense-status");
+  const modeWordBtn = document.getElementById("mode-word-btn");
+  const modePhraseBtn = document.getElementById("mode-phrase-btn");
+
+  let submitMode = "word";
+  try {
+    const savedMode = localStorage.getItem(SUBMIT_MODE_STORAGE_KEY);
+    if (savedMode === "phrase" || savedMode === "word") {
+      submitMode = savedMode;
+    }
+  } catch (_err) {
+    submitMode = "word";
+  }
+
+  function getPhraseSense() {
+    return window.WorldWordPhraseSense || null;
+  }
+
+  function setSenseStatus(message, state) {
+    if (!senseStatus) return;
+    if (!message) {
+      senseStatus.textContent = "";
+      senseStatus.className = "sense-status hidden";
+      return;
+    }
+    senseStatus.textContent = message;
+    senseStatus.className = `sense-status is-${state || "checking"}`;
+  }
+
+  function applySubmitMode(mode) {
+    submitMode = mode === "phrase" ? "phrase" : "word";
+    const isPhrase = submitMode === "phrase";
+
+    if (modeWordBtn && modePhraseBtn) {
+      modeWordBtn.classList.toggle("is-active", !isPhrase);
+      modePhraseBtn.classList.toggle("is-active", isPhrase);
+      modeWordBtn.setAttribute("aria-selected", String(!isPhrase));
+      modePhraseBtn.setAttribute("aria-selected", String(isPhrase));
+    }
+
+    wordInput.maxLength = isPhrase ? PHRASE_MAX_CHARS : WORD_MAX_CHARS;
+    wordInput.placeholder = isPhrase ? "ENTER A PHRASE" : "ENTER A WORD";
+    wordInput.setAttribute(
+      "aria-label",
+      isPhrase
+        ? "Enter a short English phrase (letters and spaces)"
+        : "Enter a single word (letters only)"
+    );
+    wordInput.classList.toggle("is-phrase-mode", isPhrase);
+    wordInput.setAttribute("autocapitalize", isPhrase ? "sentences" : "characters");
+
+    if (submitBtn) {
+      submitBtn.innerHTML = isPhrase
+        ? "<span>SUBMIT PHRASE</span>"
+        : "<span>SUBMIT WORD</span>";
+    }
+    if (promptHeading) {
+      promptHeading.textContent = isPhrase
+        ? "TYPE A REAL PHRASE TO JOIN THE GLOBAL POOL"
+        : "TYPE ANY SINGLE WORD TO JOIN THE GLOBAL POOL";
+    }
+    if (inputHint) {
+      inputHint.textContent = isPhrase
+        ? "Smart sense check · Real English words · 2–8 words · Max 80 chars"
+        : "Real English words only · Letters (A–Z) · Single word · Max 50 chars";
+    }
+
+    // Re-filter current value for the active mode
+    wordInput.dispatchEvent(new Event("input"));
+    setSenseStatus("", "");
+
+    try {
+      localStorage.setItem(SUBMIT_MODE_STORAGE_KEY, submitMode);
+    } catch (_err) {
+      // ignore
+    }
+  }
+
+  if (modeWordBtn) {
+    modeWordBtn.addEventListener("click", () => applySubmitMode("word"));
+  }
+  if (modePhraseBtn) {
+    modePhraseBtn.addEventListener("click", () => applySubmitMode("phrase"));
+  }
 
   const resultCard = document.getElementById("result-card");
   const resultTiles = document.getElementById("result-tiles");
@@ -171,19 +260,37 @@
     }
   });
 
-  // Input Filtering & Character Counter (Uppercase, Letters Only, Max 50)
+  // Input Filtering & Character Counter
   wordInput.addEventListener("input", () => {
     const raw = wordInput.value;
-    const lettersOnly = raw.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 50);
-    if (raw.toUpperCase() !== lettersOnly) {
-      wordInput.value = lettersOnly;
-      if (/[^a-zA-Z\s]/.test(raw)) {
-        showToast("Letters only (A–Z) — single word", "error", 1800);
+    if (submitMode === "phrase") {
+      const cleaned = raw
+        .replace(/[^a-zA-Z\s]/g, "")
+        .replace(/\s+/g, " ")
+        .toUpperCase()
+        .slice(0, PHRASE_MAX_CHARS);
+      if (raw.toUpperCase().replace(/\s+/g, " ") !== cleaned) {
+        if (/[^a-zA-Z\s]/.test(raw)) {
+          showToast("Phrases: letters and spaces only (A–Z)", "error", 1800);
+        }
       }
+      wordInput.value = cleaned;
+      charCounter.textContent = `${wordInput.value.length} / ${PHRASE_MAX_CHARS}`;
     } else {
-      wordInput.value = lettersOnly;
+      const lettersOnly = raw
+        .replace(/[^a-zA-Z]/g, "")
+        .toUpperCase()
+        .slice(0, WORD_MAX_CHARS);
+      if (raw.toUpperCase() !== lettersOnly) {
+        wordInput.value = lettersOnly;
+        if (/[^a-zA-Z\s]/.test(raw) || /\s/.test(raw)) {
+          showToast("Letters only (A–Z) — single word (or switch to Phrase)", "error", 1800);
+        }
+      } else {
+        wordInput.value = lettersOnly;
+      }
+      charCounter.textContent = `${wordInput.value.length} / ${WORD_MAX_CHARS}`;
     }
-    charCounter.textContent = `${wordInput.value.length} / 50`;
   });
 
   // API Helper with X-Visitor-Id Header
@@ -263,7 +370,7 @@
 
   function buildEmojiGrid(word) {
     return Array.from(String(word).toUpperCase())
-      .map((_, idx) => tileEmojiAt(idx))
+      .map((ch, idx) => (ch === " " ? " " : tileEmojiAt(idx)))
       .join("");
   }
 
@@ -283,14 +390,20 @@
     const word = String(
       submission.displayWord || submission.word || ""
     ).toUpperCase();
+    const kind =
+      submission.type === "phrase" || String(word).includes(" ")
+        ? "Phrase"
+        : "Word";
     const rank = Number(submission.globalRank ?? submission.rank ?? 0);
     const count = Number(submission.timesSaid ?? submission.count ?? 0);
     const puzzle = getDailyPuzzleNumber();
     const grid = buildEmojiGrid(word);
-    const link = buildShareUrl({ content: word.toLowerCase() });
+    const link = buildShareUrl({
+      content: word.toLowerCase().replace(/\s+/g, "-").slice(0, 40),
+    });
     return (
       `World Word 🌍 #${puzzle} · 🔥${streak}\n` +
-      `${word} · Rank #${rank.toLocaleString()} · ${count.toLocaleString()}× said\n` +
+      `${kind}: ${word} · Rank #${rank.toLocaleString()} · ${count.toLocaleString()}× said\n` +
       `${grid}\n` +
       link
     );
@@ -369,16 +482,25 @@
 
     resultTiles.innerHTML = "";
     const isLongWord = upperWord.length > 10;
+    let colorIdx = 0;
 
     Array.from(upperWord).forEach((char, idx) => {
       const tile = document.createElement("span");
-      const colorClass = TILE_COLOR_CLASSES[idx % TILE_COLOR_CLASSES.length];
-      tile.className = `letter-tile ${colorClass}${
-        isLongWord ? " compact-tile" : ""
-      }`;
-      tile.style.setProperty("--flip-delay", `${idx * 65}ms`);
-      tile.style.setProperty("--cycle-delay", `${idx * 350}ms`);
-      tile.textContent = char;
+      if (char === " ") {
+        tile.className = "letter-tile is-space";
+        tile.textContent = " ";
+        tile.setAttribute("aria-hidden", "true");
+      } else {
+        const colorClass =
+          TILE_COLOR_CLASSES[colorIdx % TILE_COLOR_CLASSES.length];
+        colorIdx += 1;
+        tile.className = `letter-tile ${colorClass}${
+          isLongWord ? " compact-tile" : ""
+        }`;
+        tile.style.setProperty("--flip-delay", `${idx * 65}ms`);
+        tile.style.setProperty("--cycle-delay", `${idx * 350}ms`);
+        tile.textContent = char;
+      }
       resultTiles.appendChild(tile);
     });
 
@@ -485,7 +607,9 @@
       if (isRecent) {
         const badge = document.createElement("span");
         badge.className = "your-word-tag";
-        badge.textContent = "YOUR WORD";
+        badge.textContent = wordUpper.includes(" ")
+          ? "YOUR PHRASE"
+          : "YOUR WORD";
         wordCell.appendChild(badge);
       }
       row.appendChild(wordCell);
@@ -526,42 +650,80 @@
     }
   }
 
-  // Handle Word Submission
+  // Handle Word / Phrase Submission
   wordForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const rawValue = wordInput.value.trim();
+    const sense = getPhraseSense();
 
     if (!rawValue) {
       triggerInputShake();
-      showToast("Please enter a word first!", "error");
+      showToast(
+        submitMode === "phrase"
+          ? "Please enter a phrase first!"
+          : "Please enter a word first!",
+        "error"
+      );
       wordInput.focus();
       return;
     }
 
-    if (!/^[a-zA-Z]+$/.test(rawValue)) {
-      triggerInputShake();
-      showToast("Single word with letters only (A–Z).", "error");
-      wordInput.focus();
-      return;
+    let payloadWord = rawValue;
+    let payloadType = submitMode;
+
+    if (submitMode === "phrase") {
+      if (!sense || typeof sense.validatePhraseSense !== "function") {
+        triggerInputShake();
+        showToast("Phrase sense engine failed to load.", "error");
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = "CHECKING SENSE...";
+      setSenseStatus("Running smart sense check…", "checking");
+      const senseResult = await sense.validatePhraseSense(rawValue);
+      if (!senseResult.ok) {
+        triggerInputShake();
+        setSenseStatus(senseResult.error || "Phrase failed sense check.", "error");
+        showToast(senseResult.error || "That phrase doesn’t make sense.", "error");
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "<span>SUBMIT PHRASE</span>";
+        wordInput.focus();
+        return;
+      }
+      payloadWord = senseResult.normalized;
+      payloadType = "phrase";
+      setSenseStatus("Sense check passed — submitting…", "ok");
+    } else {
+      if (sense && typeof sense.validateWordShape === "function") {
+        const shape = sense.validateWordShape(rawValue);
+        if (!shape.ok) {
+          triggerInputShake();
+          showToast(shape.error || "Invalid word.", "error");
+          wordInput.focus();
+          return;
+        }
+        payloadWord = shape.normalized;
+      } else if (!/^[a-zA-Z]+$/.test(rawValue)) {
+        triggerInputShake();
+        showToast("Single word with letters only (A–Z).", "error");
+        wordInput.focus();
+        return;
+      }
+      payloadType = "word";
     }
 
-    if (rawValue.length > 50) {
-      triggerInputShake();
-      showToast("Word must be 50 characters or fewer.", "error");
-      wordInput.focus();
-      return;
-    }
-
-    const originalBtnText = submitBtn.textContent;
+    const originalBtnText =
+      submitMode === "phrase" ? "SUBMIT PHRASE" : "SUBMIT WORD";
     submitBtn.disabled = true;
-    submitBtn.textContent = "CHECKING DICTIONARY...";
+    submitBtn.textContent =
+      submitMode === "phrase" ? "SUBMITTING PHRASE..." : "CHECKING DICTIONARY...";
     try {
       const response = await apiRequest("/api/submit", {
         method: "POST",
-        body: JSON.stringify({ word: rawValue }),
+        body: JSON.stringify({ word: payloadWord, type: payloadType }),
       });
 
-      recentSubmittedWord = String(response.word || rawValue).toLowerCase();
+      recentSubmittedWord = String(response.word || payloadWord).toLowerCase();
       try {
         localStorage.setItem(RECENT_WORD_STORAGE_KEY, recentSubmittedWord);
       } catch (_err) {
@@ -569,16 +731,32 @@
       }
 
       updateDailyStreak();
-      renderResultCard(response);
+      renderResultCard(
+        Object.assign({}, response, {
+          type: response.type || payloadType,
+          displayWord:
+            response.displayWord ||
+            (payloadType === "phrase"
+              ? payloadWord.toUpperCase()
+              : String(response.word || payloadWord).toUpperCase()),
+        })
+      );
       if (response.stats) {
         renderStats(response.stats);
       }
 
       wordInput.value = "";
-      charCounter.textContent = "0 / 50";
+      charCounter.textContent =
+        submitMode === "phrase"
+          ? `0 / ${PHRASE_MAX_CHARS}`
+          : `0 / ${WORD_MAX_CHARS}`;
+      setSenseStatus("", "");
 
+      const shown = (
+        response.displayWord || recentSubmittedWord
+      ).toUpperCase();
       showToast(
-        `"${recentSubmittedWord.toUpperCase()}" submitted! Ranked #${
+        `"${shown}" submitted! Ranked #${
           response.globalRank ?? response.rank
         }`,
         "success"
@@ -588,10 +766,17 @@
       resetAutoRefreshTimer();
     } catch (err) {
       triggerInputShake();
-      showToast(err.message || "Failed to submit word.", "error");
+      setSenseStatus("", "");
+      showToast(
+        err.message ||
+          (submitMode === "phrase"
+            ? "Failed to submit phrase."
+            : "Failed to submit word."),
+        "error"
+      );
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      submitBtn.innerHTML = `<span>${originalBtnText}</span>`;
       wordInput.focus();
     }
   });
@@ -629,6 +814,7 @@
 
   // Boot
   initTheme();
+  applySubmitMode(submitMode);
   if (new URLSearchParams(window.location.search).get("utm_source") === "share") {
     showToast("Welcome from a shared result — submit your word!", "info", 3200);
   }

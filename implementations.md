@@ -2,3 +2,8 @@
 **Status:** SUCCESS (user confirmed)
 **Files:** index.html, about.html, app.js, config.js, analytics.js, robots.txt, sitemap.xml, site.webmanifest, og-image.png, styles.css
 **Result:** Merged PR #1 to main; production deploy pending Cloudflare credentials (GitHub Action added on deploy branch).
+
+### 2026-11-06 - Smart phrase submissions
+**Status:** PARTIAL (awaiting user SUCCESS confirm)
+**Files:** phraseSense.js, app.js, index.html, styles.css, about.html, server/phraseValidation.mjs, server/worker-src/index.js
+**Result:** Word|Phrase mode + multi-layer sense guard (structure, Wiktionary, LanguageTool); Worker patched for phrase `/api/submit`.

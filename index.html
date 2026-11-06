@@ -247,11 +247,39 @@
         </div>
       </section>
 
-      <!-- Word Input Card -->
+      <!-- Word / Phrase Input Card -->
       <section class="input-section" aria-labelledby="prompt-heading">
         <h2 id="prompt-heading" class="section-heading">
-          TYPE ANY SINGLE WORD TO JOIN THE GLOBAL POOL
+          TYPE A WORD OR PHRASE TO JOIN THE GLOBAL POOL
         </h2>
+
+        <div
+          class="mode-toggle"
+          role="tablist"
+          aria-label="Submission mode"
+        >
+          <button
+            type="button"
+            id="mode-word-btn"
+            class="mode-btn is-active"
+            role="tab"
+            aria-selected="true"
+            data-mode="word"
+          >
+            Word
+          </button>
+          <button
+            type="button"
+            id="mode-phrase-btn"
+            class="mode-btn"
+            role="tab"
+            aria-selected="false"
+            data-mode="phrase"
+          >
+            Phrase
+          </button>
+        </div>
+
         <form id="word-form" class="word-form" novalidate>
           <div id="input-wrapper" class="input-wrapper">
             <input
@@ -270,11 +298,17 @@
               0 / 50
             </span>
           </div>
+          <p
+            id="sense-status"
+            class="sense-status hidden"
+            role="status"
+            aria-live="polite"
+          ></p>
           <button type="submit" id="submit-btn" class="submit-btn">
             <span>SUBMIT WORD</span>
           </button>
         </form>
-        <p class="input-hint">
+        <p id="input-hint" class="input-hint">
           Real English words only · Letters (A–Z) · Single word · Max 50 chars
         </p>
       </section>
@@ -445,7 +479,7 @@
 
         <h3 class="seo-subheading">Quick rules</h3>
         <ul class="seo-list">
-          <li>One real English word per submission (letters A–Z, up to 50 characters).</li>
+          <li>One real English word, or a short sense-checked phrase (2–8 words).</li>
           <li>Your word joins the global pool; rank updates in real time.</li>
           <li>Top 50 words appear on the leaderboard with live refresh every 30 seconds.</li>
           <li>Share your result with emoji tiles and a link — challenge friends to beat your rank.</li>
@@ -469,10 +503,11 @@
           </p>
         </details>
         <details class="faq-item">
-          <summary>What words are allowed?</summary>
+          <summary>What words or phrases are allowed?</summary>
           <p>
-            Submissions must pass the in-game dictionary check — real English
-            words only, single word, letters only.
+            Words must pass the dictionary check (real English, letters only).
+            Phrases must use real words and pass a smart sense check so random
+            gibberish or empty filler wording is rejected.
           </p>
         </details>
         <p class="seo-more">
@@ -528,12 +563,12 @@
 
           <ul class="modal-rules">
             <li>
-              <strong>1. Type Any Single Word:</strong> Enter a single word
-              using letters only (A–Z, up to 50 characters) and press
-              <strong>Submit Word</strong>.
+              <strong>1. Pick Word or Phrase:</strong> Submit one English word
+              (letters A–Z, up to 50) or a short phrase (2–8 real words). Smart
+              sense checks block gibberish and nonsense wording.
             </li>
             <li>
-              <strong>2. Reveal Your Global Rank:</strong> Watch your word flip
+              <strong>2. Reveal Your Global Rank:</strong> Watch your entry flip
               into animated Wordle tiles cycling through
               <span class="swatch-text swatch-green">Green</span>,
               <span class="swatch-text swatch-yellow">Yellow</span>, and
@@ -542,7 +577,7 @@
               <strong>Global Rank</strong>.
             </li>
             <li>
-              <strong>3. Climb the Leaderboard:</strong> The top 50 words are
+              <strong>3. Climb the Leaderboard:</strong> The top 50 entries are
               ranked by global frequency with proportional share bars and medals
               (🥇 🥈 🥉) for the top 3. Your most recent submission is
               highlighted on the board!
@@ -563,6 +598,7 @@
       </div>
     </div>
 
+    <script src="/phraseSense.js" defer></script>
     <script src="/app.js" defer></script>
     <script>
       document.getElementById("footer-year").textContent =
