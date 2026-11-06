@@ -1,4 +1,3 @@
 {
-  "install": "npm ci && npm test",
-  "start": "npm start"
+  "install": "npm ci"
 }
