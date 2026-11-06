@@ -3,6 +3,13 @@ main = "worker-src/index.js"
 compatibility_date = "2026-11-05"
 compatibility_flags = ["nodejs_compat"]
 
+[triggers]
+crons = ["0 * * * *", "0 15 * * 0"]
+
+[vars]
+PUBLIC_SITE_URL = "https://worldwordgame.com"
+EMAIL_FROM = "updates@worldwordgame.com"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "worldwordgame"

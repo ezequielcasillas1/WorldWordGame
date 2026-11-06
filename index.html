@@ -399,6 +399,37 @@
             >
           </div>
         </div>
+
+        <section
+          id="email-updates-panel"
+          class="email-updates-panel hidden"
+          aria-labelledby="email-updates-title"
+        >
+          <h3 id="email-updates-title" class="email-updates-title">Email me about this word</h3>
+          <p class="email-updates-copy">
+            Optional · Rank changes, milestones, weekly recap · Double opt-in · Unsubscribe anytime
+          </p>
+          <form id="email-updates-form" class="email-updates-form" novalidate>
+            <label class="email-updates-label" for="email-updates-input">Email address</label>
+            <div class="email-updates-row">
+              <input
+                type="email"
+                id="email-updates-input"
+                class="email-updates-input"
+                name="email"
+                autocomplete="email"
+                inputmode="email"
+                maxlength="254"
+                placeholder="you@example.com"
+                aria-describedby="email-updates-status"
+              />
+              <button type="submit" id="email-updates-btn" class="email-updates-btn">
+                Send confirm link
+              </button>
+            </div>
+            <p id="email-updates-status" class="email-updates-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
       </section>
 
       <!-- Global Leaderboard Section -->
