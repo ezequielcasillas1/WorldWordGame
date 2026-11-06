@@ -1,0 +1,25 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node scripts/verify.mjs",
+    "start": "npx --yes serve . -l 4173",
+    "generate:assets": "node scripts/generate-assets.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezequielcasillas1/WorldWordGame.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ezequielcasillas1/WorldWordGame/issues"
+  },
+  "homepage": "https://github.com/ezequielcasillas1/WorldWordGame#readme",
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}
