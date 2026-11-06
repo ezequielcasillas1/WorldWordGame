@@ -121,12 +121,12 @@
     if (promptHeading) {
       promptHeading.textContent = isPhrase
         ? "TYPE A REAL PHRASE TO JOIN THE GLOBAL POOL"
-        : "TYPE ANY SINGLE WORD TO JOIN THE GLOBAL POOL";
+        : "TYPE A WORD OR PHRASE TO JOIN THE GLOBAL POOL";
     }
     if (inputHint) {
       inputHint.textContent = isPhrase
         ? "Smart sense check · Real English words · 2–8 words · Max 80 chars"
-        : "Real English words only · Letters (A–Z) · Single word · Max 50 chars";
+        : "Real English words · Letters A–Z · Or tap Phrase to enter a short phrase";
     }
 
     // Re-filter current value for the active mode
