@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>World Word — Global Word Frequency Game</title>
+    <meta
+      name="description"
+      content="World Word is a Wordle-inspired global word frequency game. Submit any single word and see where it ranks worldwide."
+    />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <!-- Toast Notification Stack -->
+    <div
+      id="toast-container"
+      class="toast-container"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand" aria-label="World Word Logo">
+          <div class="logo-grid" aria-hidden="true">
+            <span class="logo-tile tile-green">W</span>
+            <span class="logo-tile tile-yellow">O</span>
+            <span class="logo-tile tile-gray">R</span>
+            <span class="logo-tile tile-green">D</span>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">WORLD WORD</h1>
+            <p class="brand-subtitle">Global Word Frequency Game</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <a
+            class="coffee-link"
+            href="https://www.buymeacoffee.com/casiezeq"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="payoffmydebt on Buy Me a Coffee"
+            title="payoffmydebt"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M17 8h1a4 4 0 0 1 0 8h-1" />
+              <path d="M3 8h14v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z" />
+              <line x1="6" y1="1" x2="6" y2="4" />
+              <line x1="10" y1="1" x2="10" y2="4" />
+              <line x1="14" y1="1" x2="14" y2="4" />
+            </svg>
+            <span>payoffmydebt</span>
+          </a>
+
+          <button
+            type="button"
+            id="how-to-play-btn"
+            class="icon-btn"
+            aria-label="How to Play"
+            title="How to Play"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span class="btn-label">How to Play</span>
+          </button>
+
+          <button
+            type="button"
+            id="theme-toggle-btn"
+            class="icon-btn"
+            aria-label="Toggle dark mode"
+            title="Toggle light/dark theme"
+          >
+            <svg
+              id="icon-moon"
+              class="theme-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg
+              id="icon-sun"
+              class="theme-icon hidden"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+      <!-- Global Stats Bar -->
+      <section class="stats-bar" aria-label="Global Statistics">
+        <div class="stat-pill">
+          <span class="stat-label">Total Submissions</span>
+          <strong id="stat-total-submissions" class="stat-value">—</strong>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Unique Words</span>
+          <strong id="stat-unique-words" class="stat-value">—</strong>
+        </div>
+        <div class="stat-pill stat-pill-highlight">
+          <span class="stat-label">Current #1 Word</span>
+          <strong id="stat-top-word" class="stat-value stat-top-word">—</strong>
+        </div>
+      </section>
+
+      <!-- Word Input Card -->
+      <section class="input-section" aria-labelledby="prompt-heading">
+        <h2 id="prompt-heading" class="section-heading">
+          TYPE ANY SINGLE WORD TO JOIN THE GLOBAL POOL
+        </h2>
+        <form id="word-form" class="word-form" novalidate>
+          <div id="input-wrapper" class="input-wrapper">
+            <input
+              type="text"
+              id="word-input"
+              name="word"
+              class="word-input"
+              placeholder="ENTER A WORD"
+              maxlength="50"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              aria-label="Enter a single word (letters only)"
+            />
+            <span id="char-counter" class="char-counter" aria-hidden="true">
+              0 / 50
+            </span>
+          </div>
+          <button type="submit" id="submit-btn" class="submit-btn">
+            <span>SUBMIT WORD</span>
+          </button>
+        </form>
+        <p class="input-hint">
+          Real English words only · Letters (A–Z) · Single word · Max 50 chars
+        </p>
+      </section>
+
+      <!-- Result Card (Shown after submitting a word) -->
+      <section
+        id="result-card"
+        class="result-card hidden"
+        aria-live="polite"
+        aria-label="Your Submitted Word Result"
+      >
+        <div class="result-header">
+          <span class="result-badge">YOUR SUBMISSION</span>
+          <span id="result-share-note" class="result-share-note"></span>
+        </div>
+
+        <div
+          id="result-tiles"
+          class="result-tiles"
+          role="img"
+          aria-label="Submitted word letter tiles"
+        ></div>
+
+        <div class="result-metrics">
+          <div class="metric-box">
+            <span class="metric-label">Times Said</span>
+            <strong id="result-times-said" class="metric-number">0</strong>
+          </div>
+          <div class="metric-divider" aria-hidden="true"></div>
+          <div class="metric-box">
+            <span class="metric-label">Global Rank</span>
+            <strong id="result-global-rank" class="metric-number">#1</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Global Leaderboard Section -->
+      <section class="leaderboard-section" aria-labelledby="leaderboard-title">
+        <div class="leaderboard-header">
+          <div>
+            <h2 id="leaderboard-title" class="leaderboard-title">
+              GLOBAL LEADERBOARD
+            </h2>
+            <p class="leaderboard-subtitle">
+              Top 50 most-submitted words worldwide
+            </p>
+          </div>
+
+          <div class="refresh-controls">
+            <span id="auto-refresh-label" class="auto-refresh-label">
+              Auto-refresh in <strong id="countdown-seconds">30</strong>s
+            </span>
+            <button
+              type="button"
+              id="refresh-btn"
+              class="refresh-btn"
+              aria-label="Refresh leaderboard now"
+              title="Refresh leaderboard"
+            >
+              <svg
+                id="refresh-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="23 4 23 10 17 10" />
+                <polyline points="1 20 1 14 7 14" />
+                <path
+                  d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                />
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="leaderboard-columns" aria-hidden="true">
+          <span>RANK</span>
+          <span>WORD</span>
+          <span class="col-right">COUNT</span>
+          <span class="col-right">SHARE</span>
+        </div>
+
+        <div id="leaderboard-list" class="leaderboard-list" role="list"></div>
+      </section>
+    </main>
+
+    <!-- How to Play Modal -->
+    <div
+      id="how-to-play-modal"
+      class="modal-backdrop hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="modal-title" class="modal-title">HOW TO PLAY</h2>
+          <button
+            type="button"
+            id="modal-close-btn"
+            class="modal-close-btn"
+            aria-label="Close How to Play modal"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p class="modal-lead">
+            <strong>World Word</strong> is a real-time global word frequency
+            experiment. Every word submitted joins a single shared pool across
+            the planet.
+          </p>
+
+          <div class="modal-demo-tiles" aria-hidden="true">
+            <span class="demo-tile tile-green">W</span>
+            <span class="demo-tile tile-yellow">O</span>
+            <span class="demo-tile tile-gray">R</span>
+            <span class="demo-tile tile-green">L</span>
+            <span class="demo-tile tile-yellow">D</span>
+          </div>
+
+          <ul class="modal-rules">
+            <li>
+              <strong>1. Type Any Single Word:</strong> Enter a single word
+              using letters only (A–Z, up to 50 characters) and press
+              <strong>Submit Word</strong>.
+            </li>
+            <li>
+              <strong>2. Reveal Your Global Rank:</strong> Watch your word flip
+              into animated Wordle tiles cycling through
+              <span class="swatch-text swatch-green">Green</span>,
+              <span class="swatch-text swatch-yellow">Yellow</span>, and
+              <span class="swatch-text swatch-gray">Gray</span>, alongside how
+              many <strong>Times Said</strong> and its
+              <strong>Global Rank</strong>.
+            </li>
+            <li>
+              <strong>3. Climb the Leaderboard:</strong> The top 50 words are
+              ranked by global frequency with proportional share bars and medals
+              (🥇 🥈 🥉) for the top 3. Your most recent submission is
+              highlighted on the board!
+            </li>
+            <li>
+              <strong>4. Live Updates:</strong> The leaderboard automatically
+              refreshes every 30 seconds or anytime you hit
+              <strong>Refresh</strong>.
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modal-got-it-btn" class="submit-btn">
+            LET'S PLAY
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/moderation.js" defer></script>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
