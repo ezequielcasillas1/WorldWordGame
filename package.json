@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node scripts/verify.mjs",
     "start": "npx --yes serve . -l 4173",
-    "generate:assets": "node scripts/generate-assets.mjs"
+    "generate:assets": "node scripts/generate-assets.mjs",
+    "deploy": "wrangler pages deploy . --project-name=worldwordgame --branch=main"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/ezequielcasillas1/WorldWordGame#readme",
   "devDependencies": {
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "wrangler": "^4.158.0"
   }
 }

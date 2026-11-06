@@ -1,6 +1,18 @@
 # World Word — Global Word Frequency Game
 
-Static frontend for [worldwordgame.com](https://worldwordgame.com/). Deploy the repo root to Cloudflare Pages (API routes are served separately on the same domain).
+Static frontend for [worldwordgame.com](https://worldwordgame.com/).
+
+## Deploy (Cloudflare Pages)
+
+**GitHub Actions (recommended):** add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Pushes to `main` run `.github/workflows/deploy-cloudflare-pages.yml`. If your Pages project name is not `worldwordgame`, edit `CLOUDFLARE_PAGES_PROJECT_NAME` in that workflow.
+
+**Local CLI (if you are already logged in with Wrangler):**
+
+```bash
+npm ci && npm test && npm run deploy
+```
+
+Static assets only — keep your existing Worker/API routes for `/api/*` unchanged in the Cloudflare dashboard.
 
 ## Local preview
 
