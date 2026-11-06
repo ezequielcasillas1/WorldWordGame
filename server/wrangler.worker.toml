@@ -1,0 +1,17 @@
+name = "worldwordgame"
+main = "worker-src/index.js"
+compatibility_date = "2026-11-05"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "worldwordgame"
+database_id = "06f5f4a6-493c-4818-8d53-4ba223f834d5"
+
+# Static assets already attached to this Worker; keep_assets is handled by
+# uploading without replacing the assets directory when possible.
+# For full asset sync, deploy from repo root with [assets] configured.
+[assets]
+directory = ".."
+binding = "ASSETS"
+not_found_handling = "single-page-application"
